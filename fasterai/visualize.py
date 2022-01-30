@@ -31,10 +31,9 @@ class ModelImageVisualizer():
     def _open_pil_image(self, path:Path)->Image:
         return PIL.Image.open(path).convert('RGB')
 
-    def _get_image_from_url(self, url:str)->Image:
+    def _get_image_from_url(self, url:str) -> Image:
         response = requests.get(url)
-        img = PIL.Image.open(BytesIO(response.content)).convert('RGB')
-        return img
+        return PIL.Image.open(BytesIO(response.content)).convert('RGB')
 
     def plot_transformed_image_from_url(self, url:str, path:str='test_images/image.png', figsize:(int,int)=(20,20), 
             render_factor:int=None, display_render_factor:bool=False, compare:bool=False)->Path:
@@ -69,11 +68,10 @@ class ModelImageVisualizer():
         image.save(result_path)
         return result_path
 
-    def get_transformed_image(self, path:Path, render_factor:int=None)->Image:
+    def get_transformed_image(self, path:Path, render_factor:int=None) -> Image:
         self._clean_mem()
         orig_image = self._open_pil_image(path)
-        filtered_image = self.filter.filter(orig_image, orig_image, render_factor=render_factor)
-        return filtered_image
+        return self.filter.filter(orig_image, orig_image, render_factor=render_factor)
 
     def _plot_image(self, image:Image, render_factor:int, axes:Axes=None, figsize=(20,20), display_render_factor:bool=False):
         if axes is None: 
@@ -203,18 +201,16 @@ def get_image_colorizer(render_factor:int=35, artistic:bool=True)->ModelImageVis
         return get_stable_image_colorizer(render_factor=render_factor)
 
 def get_stable_image_colorizer(root_folder:Path=Path('./'), weights_name:str='ColorizeStable_gen', 
-        results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
+        results_dir='result_images', render_factor:int=35) -> ModelImageVisualizer:
     learn = gen_inference_wide(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
-    vis = ModelImageVisualizer(filtr, results_dir=results_dir)
-    return vis
+    return ModelImageVisualizer(filtr, results_dir=results_dir)
 
 def get_artistic_image_colorizer(root_folder:Path=Path('./'), weights_name:str='ColorizeArtistic_gen', 
-        results_dir='result_images', render_factor:int=35)->ModelImageVisualizer:
+        results_dir='result_images', render_factor:int=35) -> ModelImageVisualizer:
     learn = gen_inference_deep(root_folder=root_folder, weights_name=weights_name)
     filtr = MasterFilter([ColorizerFilter(learn=learn)], render_factor=render_factor)
-    vis = ModelImageVisualizer(filtr, results_dir=results_dir)
-    return vis
+    return ModelImageVisualizer(filtr, results_dir=results_dir)
 
 def show_image_in_notebook(image_path:Path):
     ipythondisplay.display(ipythonimage(str(image_path)))

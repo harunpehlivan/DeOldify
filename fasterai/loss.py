@@ -81,14 +81,14 @@ class WassFeatureLoss(nn.Module):
         mean_diff_squared = (mean_stl - mean_synth).pow(2).sum()
         cov_prod = torch.mm(torch.mm(root_cov_stl, cov_synth), root_cov_stl)
         var_overlap = torch.sqrt(torch.symeig(cov_prod, eigenvectors=True)[0].clamp(min=0)+1e-8).sum()
-        dist = mean_diff_squared + tr_cov_stl + tr_cov_synth - 2*var_overlap
-        return dist
+        return mean_diff_squared + tr_cov_stl + tr_cov_synth - 2*var_overlap
 
     def _single_wass_loss(self, pred, targ):
         mean_test, tr_cov_test, root_cov_test = targ
         mean_synth, cov_synth = self._calc_2_moments(pred)
-        loss = self._calc_l2wass_dist(mean_test, tr_cov_test, root_cov_test, mean_synth, cov_synth)
-        return loss
+        return self._calc_l2wass_dist(
+            mean_test, tr_cov_test, root_cov_test, mean_synth, cov_synth
+        )
     
     def forward(self, input, target):
         out_feat = self._make_features(target, clone=True)
